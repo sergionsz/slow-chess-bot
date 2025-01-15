@@ -1,0 +1,63 @@
+name:                slow-chess-bot
+version:             0.1.0.0
+github:              "sergionsz/slow-chess-bot"
+license:             GPL-3.0-or-later
+author:              "Sergio NS"
+maintainer:          ""
+copyright:           "2025 Sergio NS"
+
+extra-source-files:
+- README.md
+- CHANGELOG.md
+
+# Metadata used when publishing your package
+# synopsis:            Short description of your package
+# category:            Web
+
+# To avoid duplicated efforts in documentation and dealing with the
+# complications of embedding Haddock markup inside cabal files, it is
+# common to point users to the README.md file.
+description:         Telegram bot to play correspondence chess
+
+dependencies:
+- base >= 4.7 && < 5
+- telegram-bot-simple
+- telegram-bot-api
+- text
+- chessIO
+
+ghc-options:
+- -Wall
+- -Wcompat
+- -Widentities
+- -Wincomplete-record-updates
+- -Wincomplete-uni-patterns
+- -Wmissing-export-lists
+- -Wmissing-home-modules
+- -Wpartial-fields
+- -Wredundant-constraints
+
+library:
+  source-dirs: src
+
+executables:
+  slow-chess-bot-exe:
+    main:                Main.hs
+    source-dirs:         app
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - slow-chess-bot
+
+tests:
+  slow-chess-bot-test:
+    main:                Spec.hs
+    source-dirs:         test
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - slow-chess-bot
