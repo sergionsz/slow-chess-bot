@@ -19,6 +19,7 @@ import Database.Redis
 import Util
 import Board (fenToimage)
 import Data.Char (toLower)
+import Debug.Trace (trace)
 
 
 data Model = Model { redisConnection :: Connection }
@@ -39,6 +40,7 @@ getChatId update = case updateMessage update of
   Nothing -> ChatId 0
 
 updateToAction :: Update -> Model -> Maybe Action
+-- updateToAction update _ | trace ("updateToAction " ++ show update) False = undefined
 updateToAction update _ = case updateMessageText update of
       Just text -> do
         let moveText = getMove text
