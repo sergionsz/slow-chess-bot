@@ -1,0 +1,78 @@
+cabal-version: 2.2
+
+-- This file has been generated from package.yaml by hpack version 0.37.0.
+--
+-- see: https://github.com/sol/hpack
+
+name:           slow-chess-bot
+version:        0.1.0.0
+description:    Telegram bot to play correspondence chess
+homepage:       https://github.com/sergionsz/slow-chess-bot#readme
+bug-reports:    https://github.com/sergionsz/slow-chess-bot/issues
+author:         Sergio NS
+copyright:      2025 Sergio NS
+license:        GPL-3.0-or-later
+license-file:   LICENSE
+build-type:     Simple
+extra-source-files:
+    README.md
+    CHANGELOG.md
+
+source-repository head
+  type: git
+  location: https://github.com/sergionsz/slow-chess-bot
+
+library
+  exposed-modules:
+      Util
+  other-modules:
+      Paths_slow_chess_bot
+  autogen-modules:
+      Paths_slow_chess_bot
+  hs-source-dirs:
+      src
+  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints
+  build-depends:
+      base >=4.7 && <5
+    , chessIO
+    , telegram-bot-api
+    , telegram-bot-simple
+    , text
+  default-language: Haskell2010
+
+executable slow-chess-bot-exe
+  main-is: Main.hs
+  other-modules:
+      Paths_slow_chess_bot
+  autogen-modules:
+      Paths_slow_chess_bot
+  hs-source-dirs:
+      app
+  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      base >=4.7 && <5
+    , chessIO
+    , slow-chess-bot
+    , telegram-bot-api
+    , telegram-bot-simple
+    , text
+  default-language: Haskell2010
+
+test-suite slow-chess-bot-test
+  type: exitcode-stdio-1.0
+  main-is: Spec.hs
+  other-modules:
+      Paths_slow_chess_bot
+  autogen-modules:
+      Paths_slow_chess_bot
+  hs-source-dirs:
+      test
+  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      base >=4.7 && <5
+    , chessIO
+    , slow-chess-bot
+    , telegram-bot-api
+    , telegram-bot-simple
+    , text
+  default-language: Haskell2010
