@@ -35,6 +35,7 @@ library
   build-depends:
       base >=4.7 && <5
     , chessIO
+    , hedis
     , telegram-bot-api
     , telegram-bot-simple
     , text
@@ -52,6 +53,7 @@ executable slow-chess-bot-exe
   build-depends:
       base >=4.7 && <5
     , chessIO
+    , hedis
     , slow-chess-bot
     , telegram-bot-api
     , telegram-bot-simple
@@ -71,6 +73,7 @@ test-suite slow-chess-bot-test
   build-depends:
       base >=4.7 && <5
     , chessIO
+    , hedis
     , slow-chess-bot
     , telegram-bot-api
     , telegram-bot-simple

@@ -25,6 +25,7 @@ dependencies:
 - telegram-bot-api
 - text
 - chessIO
+- hedis
 
 ghc-options:
 - -Wall
