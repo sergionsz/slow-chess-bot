@@ -2,10 +2,9 @@
 
 module Main (main) where
 
-import           Data.Text                        (Text, pack, unpack)
+import           Data.Text                        (Text, pack, unpack, unlines, concat)
 import Data.Maybe                                 (isJust, fromJust)
 import Control.Monad.IO.Class
-import Data.Text.Encoding
 
 import           Telegram.Bot.API
 import           Telegram.Bot.Simple
@@ -17,6 +16,7 @@ import Game.Chess.SAN
 import Database.Redis
 
 import Util
+import Db
 import Board (fenToimage)
 import Data.Char (toLower)
 
@@ -24,6 +24,22 @@ import Data.Char (toLower)
 data Model = Model { redisConnection :: Connection }
 
 data Action = AttemptMove Text ChatId | Answer Text
+
+helpText :: Text
+helpText = Data.Text.unlines
+      [ "Wellcome to Slow Chess!"
+      , ""
+      , "I can help you play correspondence chess with a friend"
+      , ""
+      , Data.Text.concat ["To use me, just add me and your friend to a Telegram group "
+      , "and start a game by sending the first move in SAN notation"]
+      , ""
+      , Data.Text.concat ["For example, you can use the very popular /e4 "
+      , "or maybe /Nf3 is more your style"]
+      , ""
+      , Data.Text.concat ["The game will finish on checkmate or stalemate "
+      , "after which you can start a new game with a new starting move"]
+      ]
 
 slowChessBot :: Connection -> BotApp Model Action
 slowChessBot conn = BotApp
@@ -33,56 +49,23 @@ slowChessBot conn = BotApp
   , botJobs = []
   }
 
-getChatId :: Update -> ChatId
-getChatId update = case updateMessage update of
-  Just message -> chatId $ messageChat message
-  Nothing -> ChatId 0
-
 updateToAction :: Update -> Model -> Maybe Action
--- updateToAction update _ | trace ("updateToAction " ++ show update) False = undefined
 updateToAction update _ = case updateMessageText update of
       Just text -> do
-        let moveText = getMove text
-        let chatID = getChatId update
-        if chatID == ChatId 0
-          then
-            Just (Answer "Can't find chatID")
-        else if isJust moveText
-          then 
-          Just (AttemptMove (fromJust moveText) chatID)
-        else Nothing
+        let trimmed = trim text
+        if trimmed == pack "/help" || trimmed == pack "/start" then Just (Answer helpText) else do
+          let moveText = getMove trimmed
+          let chatID = getChatId update
+          if isJust moveText && chatID /= ChatId 0
+            then 
+            Just (AttemptMove (fromJust moveText) chatID)
+          else Nothing
       Nothing   -> Nothing
-
-
-dbGet :: MonadIO m => Connection -> Text -> m(Maybe Text)
-dbGet redisConn key = do
-  let keyBB = encodeUtf8 key
-  result <- liftIO $ runRedis redisConn $ get keyBB
-  
-  case result of
-    Right (Just value) -> return $ Just $ decodeLatin1 value
-    Right _ -> return Nothing
-    -- TODO: Handle errors differently than just returning Nothing
-    Left _ -> return Nothing
-
-dbSave :: MonadIO m => Connection -> Text -> Text -> m ()
-dbSave redisConn key value = do
-  let keyBB = encodeUtf8 key
-  let valueBB = encodeUtf8 value
-  _ <- liftIO $ runRedis redisConn $ set keyBB valueBB
-  return ()
-
-dbDelete :: MonadIO m => Connection -> Text -> m ()
-dbDelete redisConn key = do
-  let keyBB = encodeUtf8 key
-  _ <- liftIO $ runRedis redisConn $ del [keyBB]
-  return ()
 
 sendImage :: Integer -> Text -> Maybe Ply -> BotM Text
 sendImage chatID fen maybePly = do
   let sanMove = case maybePly of {
     Just ply -> Just ((map toLower (show $ plySource ply)), (map toLower (show $ plyTarget ply))) ;
-    -- TODO: Change Board lib so that the ply is optional
     Nothing -> Nothing
   }
   let imageName = "board" ++ (show chatID) ++ ".png"

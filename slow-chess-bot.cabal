@@ -24,6 +24,7 @@ source-repository head
 
 library
   exposed-modules:
+      Db
       Util
   other-modules:
       Paths_slow_chess_bot
