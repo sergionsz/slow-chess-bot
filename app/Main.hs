@@ -52,38 +52,55 @@ updateToAction update _ = case updateMessageText update of
         else Nothing
       Nothing   -> Nothing
 
+
+dbGet :: MonadIO m => Connection -> Text -> m(Maybe Text)
+dbGet redisConn key = do
+  let keyBB = encodeUtf8 key
+  result <- liftIO $ runRedis redisConn $ get keyBB
+  
+  case result of
+    Right (Just value) -> return $ Just $ decodeLatin1 value
+    Right _ -> return Nothing
+    Left _ -> return Nothing
+
+dbSave :: MonadIO m => Connection -> Text -> Text -> m ()
+dbSave redisConn key value = do
+  let keyBB = encodeUtf8 key
+  let valueBB = encodeUtf8 value
+  _ <- liftIO $ runRedis redisConn $ set keyBB valueBB
+  return ()
+
 handleAction :: Action -> Model -> Eff Action Model
 handleAction action model = case action of
   Answer msg -> model <# do
     pure msg
-  AttemptMove moveText chatID -> model <# do
+  AttemptMove moveText (ChatId chatID) -> model <# do
     let conn = redisConnection model
-    let chatIDBS = encodeUtf8 $ pack $ show $ chatID
-    boardDB <- liftIO $ runRedis conn $ get chatIDBS
+    let chatIDT = pack $ show chatID
+    boardDB <- dbGet conn chatIDT
     _ <- traceM ("boardDB " ++ show boardDB)
     case boardDB of
-      Right (Just boardFEN) -> do
-        case fromFEN $ unpack $ decodeLatin1 boardFEN of
+      Just boardFEN -> do
+        case fromFEN $ unpack boardFEN of
           Just board -> do
             _ <- traceM ("board " ++ show board)
             case fromSAN board moveText of
               Right ply -> do
                 let newPosition = unsafeDoPly board ply
-                let newBoard = encodeUtf8 $ pack $ toFEN newPosition
-                _ <- liftIO $ runRedis conn $ set chatIDBS newBoard
-                pure $ decodeLatin1 newBoard
+                let newBoard = pack $ toFEN newPosition
+                _ <- dbSave conn chatIDT newBoard
+                pure $ newBoard
               Left _ -> pure "Illegal move from board"
           Nothing -> pure "Coulnd't parse board from FEN"
-      Right (Nothing) -> do
+      Nothing -> do
         _ <- traceM ("new board")
         case fromSAN startpos moveText of
           Right ply -> do
             let newPosition = unsafeDoPly startpos ply
-            let newBoard = encodeUtf8 $ pack $ toFEN newPosition
-            _ <- liftIO $ runRedis conn $ set chatIDBS newBoard
-            pure $ decodeLatin1 newBoard
+            let newBoard = pack $ toFEN newPosition
+            _ <- dbSave conn chatIDT newBoard
+            pure newBoard
           Left _ -> pure "Illegal initial move"
-      Left _ -> pure "Something went wrong when trying to connect to the DB"
 
 main :: IO ()
 main = do
