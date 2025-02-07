@@ -12,15 +12,15 @@ packages:
   original:
     hackage: chessIO-0.9.5.0@sha256:829e50791b32c2310f07e89afb236decaa347f8168dc9773fdf85e7134834f41,5044
 - completed:
-    commit: 55421a81f8e3bcdbbe104f46ff5b25f5e7572813
+    commit: f67b656668b62717826b524caa121584c99df6b9
     git: https://github.com/sergionsz/fen2Image.git
     name: fen-to-image
     pantry-tree:
-      sha256: 463d73f433ff15494c614e68c96fdeb44b521bcd59fcb54556674693f5fff151
+      sha256: f3153bf44d747061eaa65204c08cabdcd20bf179e42bb08cedc007fd780fbdcc
       size: 670
     version: 0.1.0.0
   original:
-    commit: 55421a81f8e3bcdbbe104f46ff5b25f5e7572813
+    commit: f67b656668b62717826b524caa121584c99df6b9
     git: https://github.com/sergionsz/fen2Image.git
 snapshots:
 - completed:

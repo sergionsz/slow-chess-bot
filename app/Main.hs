@@ -19,7 +19,6 @@ import Database.Redis
 import Util
 import Board (fenToimage)
 import Data.Char (toLower)
-import Debug.Trace (trace)
 
 
 data Model = Model { redisConnection :: Connection }
@@ -82,13 +81,13 @@ dbDelete redisConn key = do
 sendImage :: Integer -> Text -> Maybe Ply -> BotM Text
 sendImage chatID fen maybePly = do
   let sanMove = case maybePly of {
-    Just ply -> ((map toLower (show $ plySource ply)), (map toLower (show $ plyTarget ply))) ;
+    Just ply -> Just ((map toLower (show $ plySource ply)), (map toLower (show $ plyTarget ply))) ;
     -- TODO: Change Board lib so that the ply is optional
-    Nothing -> ("", "")
+    Nothing -> Nothing
   }
   let imageName = "board" ++ (show chatID) ++ ".png"
   let inputFile = InputFile imageName "image/png"
-  _ <- liftIO $ fenToimage (unpack fen) sanMove 800 imageName
+  _ <- liftIO $ fenToimage (unpack fen) sanMove Nothing imageName
   let photoFile = MakePhotoFile inputFile
   let sendPhotoRequest = defSendPhoto (SomeChatId (ChatId chatID)) photoFile
   response <- liftClientM $ sendPhoto sendPhotoRequest
