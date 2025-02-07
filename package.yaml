@@ -26,6 +26,7 @@ dependencies:
 - text
 - chessIO
 - hedis
+- fen-to-image
 
 ghc-options:
 - -Wall
