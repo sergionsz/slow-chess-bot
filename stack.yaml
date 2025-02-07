@@ -37,8 +37,10 @@ packages:
 #
 extra-deps:
 - chessIO-0.9.5.0@sha256:829e50791b32c2310f07e89afb236decaa347f8168dc9773fdf85e7134834f41,5044
+
+# fen2Image
 - git: https://github.com/sergionsz/fen2Image.git
-  commit: f67b656668b62717826b524caa121584c99df6b9
+  commit: 12d4037307cbfc4508cc4f82d492fafd95db007f
 # - git: https://github.com/commercialhaskell/stack.git
 #   commit: e7b331f14bcffb8367cd58fbfc8b40ec7642100a
 #
